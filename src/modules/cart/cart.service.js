@@ -1,6 +1,6 @@
 import { CartModel } from './model.js';
 import { ProductService } from '../product/product.service.js';
-import { PricingService } from '../../core/services/pricing.service.js';
+import { PricingService } from '../pricing/pricing.service.js';
 import { logger } from '../../utils/logger.js';
 
 export class CartService {

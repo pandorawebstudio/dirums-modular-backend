@@ -30,7 +30,10 @@ const discountSchema = new mongoose.Schema({
     enum: ['PERCENTAGE', 'FIXED', 'BUY_X_GET_Y'],
     required: true
   },
-  value: Number,
+  value: {
+    type: Number,
+    required: true
+  },
   minPurchase: Number,
   maxDiscount: Number,
   startDate: Date,
@@ -43,44 +46,26 @@ const discountSchema = new mongoose.Schema({
   conditions: {
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    userGroups: [String]
+    customerGroups: [String],
+    buyQuantity: Number,
+    getQuantity: Number,
+    targetProduct: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
   },
   status: {
     type: String,
     enum: ['ACTIVE', 'INACTIVE', 'EXPIRED'],
     default: 'ACTIVE'
   }
+}, {
+  timestamps: true
 });
 
-const rewardPointSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  points: {
-    type: Number,
-    default: 0
-  },
-  history: [{
-    action: {
-      type: String,
-      enum: ['EARNED', 'SPENT', 'EXPIRED', 'ADJUSTED'],
-      required: true
-    },
-    points: Number,
-    orderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Order'
-    },
-    description: String,
-    date: {
-      type: Date,
-      default: Date.now
-    }
-  }]
-});
+// Indexes
+exchangeRateSchema.index({ baseCurrency: 1, targetCurrency: 1 }, { unique: true });
+exchangeRateSchema.index({ lastUpdated: 1 });
+discountSchema.index({ code: 1 });
+discountSchema.index({ status: 1 });
+discountSchema.index({ startDate: 1, endDate: 1 });
 
-export const ExchangeRate = mongoose.model('ExchangeRate', exchangeRateSchema);
-export const Discount = mongoose.model('Discount', discountSchema);
-export const RewardPoint = mongoose.model('RewardPoint', rewardPointSchema);
+export const ExchangeRateModel = mongoose.model('ExchangeRate', exchangeRateSchema);
+export const DiscountModel = mongoose.model('Discount', discountSchema);

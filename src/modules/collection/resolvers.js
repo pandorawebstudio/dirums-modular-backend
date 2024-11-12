@@ -1,4 +1,4 @@
-import { CollectionService } from '../../core/services/collection.service.js';
+import { CollectionService } from './collection.service.js';
 
 const collectionService = new CollectionService();
 

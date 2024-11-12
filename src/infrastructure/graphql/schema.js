@@ -6,6 +6,10 @@ import { collectionTypeDefs, collectionResolvers } from '../../modules/collectio
 import { mediaTypeDefs, mediaResolvers } from '../../modules/media/index.js';
 import { userTypeDefs, userResolvers } from '../../modules/user/index.js';
 import { rbacTypeDefs, rbacResolvers } from '../../modules/auth/rbac/index.js';
+import { categoryTypeDefs, categoryResolvers } from '../../modules/category/index.js';
+import { pricingTypeDefs, pricingResolvers } from '../../modules/pricing/index.js';
+import { notificationTypeDefs, notificationResolvers } from '../../modules/notification/index.js';
+import { cartTypeDefs, cartResolvers } from '../../modules/cart/index.js';
 
 const rootTypeDefs = `
   scalar JSON
@@ -30,7 +34,11 @@ export const schema = makeExecutableSchema({
     collectionTypeDefs,
     mediaTypeDefs,
     userTypeDefs,
-    rbacTypeDefs
+    rbacTypeDefs,
+    categoryTypeDefs,
+    pricingTypeDefs,
+    notificationTypeDefs,
+    cartTypeDefs
   ],
   resolvers: [
     authResolvers,
@@ -39,6 +47,10 @@ export const schema = makeExecutableSchema({
     collectionResolvers,
     mediaResolvers,
     userResolvers,
-    rbacResolvers
+    rbacResolvers,
+    categoryResolvers,
+    pricingResolvers,
+    notificationResolvers,
+    cartResolvers
   ]
 });

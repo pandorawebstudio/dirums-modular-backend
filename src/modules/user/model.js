@@ -49,12 +49,24 @@ const userSchema = new mongoose.Schema({
         enum: ['PENDING', 'VERIFIED', 'REJECTED'],
         default: 'PENDING'
       }
-    }]
+    }],
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'SUSPENDED'],
+      default: 'ACTIVE'
+    }
   }
 }, {
   timestamps: true
 });
 
+// Indexes
+userSchema.index({ email: 1 }, { sparse: true });
+userSchema.index({ phoneNumber: 1 }, { sparse: true });
+userSchema.index({ role: 1 });
+userSchema.index({ 'businessProfile.status': 1 });
+
+// Password hashing middleware
 userSchema.pre('save', async function(next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
@@ -62,8 +74,10 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+// Password comparison method
 userSchema.methods.comparePassword = async function(password) {
   return bcrypt.compare(password, this.password);
 };
 
-export const UserModel = mongoose.model('User', userSchema);
+// Export the model only if it hasn't been compiled yet
+export const UserModel = mongoose.models.User || mongoose.model('User', userSchema);

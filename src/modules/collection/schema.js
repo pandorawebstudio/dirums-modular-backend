@@ -4,7 +4,7 @@ export const collectionTypeDefs = `
     title: String!
     handle: String!
     description: String
-    image: Image
+    image: Media
     type: CollectionType!
     ruleGroups: [RuleGroup!]
     products: [Product!]
@@ -78,7 +78,7 @@ export const collectionTypeDefs = `
   input CreateCollectionInput {
     title: String!
     description: String
-    image: ImageInput
+    image: MediaInput
     type: CollectionType!
     ruleGroups: [RuleGroupInput]
     products: [ID!]
@@ -89,7 +89,7 @@ export const collectionTypeDefs = `
   input UpdateCollectionInput {
     title: String
     description: String
-    image: ImageInput
+    image: MediaInput
     ruleGroups: [RuleGroupInput]
     products: [ID!]
     sortOrder: SortOrderInput
@@ -112,12 +112,12 @@ export const collectionTypeDefs = `
     direction: SortDirection!
   }
 
-  input ImageInput {
-    url: String!
+  input MediaInput {
+    id: ID!
     alt: String
   }
 
-  type Query {
+  extend type Query {
     collections(
       limit: Int
       offset: Int
@@ -133,7 +133,7 @@ export const collectionTypeDefs = `
     ): [Product!]!
   }
 
-  type Mutation {
+  extend type Mutation {
     createCollection(input: CreateCollectionInput!): Collection!
     updateCollection(id: ID!, input: UpdateCollectionInput!): Collection!
     deleteCollection(id: ID!): Boolean!

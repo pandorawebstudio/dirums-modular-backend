@@ -5,7 +5,6 @@ import jwt from '@fastify/jwt';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import helmet from '@fastify/helmet';
-import compress from '@fastify/compress';
 import csrf from '@fastify/csrf-protection';
 import swagger from '@fastify/swagger';
 
@@ -15,12 +14,17 @@ import { connectCache, closeCache } from './infrastructure/cache/index.js';
 import { config } from './config/index.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './utils/error-handler.js';
-import { sanitizeInputs } from './middleware/security.js';
+import { sanitizeInput } from './utils/security.js';
 import { swaggerOptions } from './config/swagger.js';
-import { setupGracefulShutdown } from './utils/graceful-shutdown.js';
+import { configureAuthModule } from './modules/auth/auth.module.js';
+import { configureProductModule } from './modules/product/product.module.js';
+import { configureOrderModule } from './modules/order/order.module.js';
+import { configureCollectionModule } from './modules/collection/collection.module.js';
+import { configureMediaModule } from './modules/media/media.module.js';
+import { configureUserModule } from './modules/user/user.module.js';
+import { configureHealthModule } from './modules/health/health.module.js';
 
 export const app = Fastify({
-  logger,
   trustProxy: true
 });
 
@@ -33,7 +37,7 @@ async function startServer() {
     // Security plugins
     await app.register(helmet);
     await app.register(cors, config.cors);
-    await app.register(compress);
+
     await app.register(rateLimit, config.rateLimit);
     await app.register(csrf);
 
@@ -45,7 +49,16 @@ async function startServer() {
     await app.register(multipart);
 
     // Add input sanitization
-    app.addHook('preHandler', sanitizeInputs);
+    app.addHook('preHandler', sanitizeInput);
+
+    // Configure modules
+    await configureAuthModule(app);
+    await configureProductModule(app);
+    await configureOrderModule(app);
+    await configureCollectionModule(app);
+    await configureMediaModule(app);
+    await configureUserModule(app);
+    await configureHealthModule(app);
 
     // GraphQL
     await app.register(mercurius, {
@@ -55,17 +68,25 @@ async function startServer() {
       errorHandler
     });
 
-    // Health check
-    app.get('/health', () => ({ status: 'ok' }));
-
     // Start server
     await app.listen({
       port: config.port,
       host: config.host
     });
 
-    // Setup graceful shutdown
-    setupGracefulShutdown(app);
+    logger.info(`Server listening on ${config.host}:${config.port}`);
+
+    // Graceful shutdown
+    const shutdown = async () => {
+      logger.info('Shutting down server...');
+      await app.close();
+      await closeDatabase();
+      await closeCache();
+      process.exit(0);
+    };
+
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
 
   } catch (error) {
     logger.error(error);
