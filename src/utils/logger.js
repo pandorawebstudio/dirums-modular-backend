@@ -1,9 +1,10 @@
 import pino from 'pino';
-import { config } from '../config/index.js';
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 export const logger = pino({
-  level: config.isDevelopment ? 'debug' : 'info',
-  transport: config.isDevelopment ? {
+  level: isDevelopment ? 'debug' : 'info',
+  transport: isDevelopment ? {
     target: 'pino-pretty',
     options: {
       colorize: true

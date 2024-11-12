@@ -9,14 +9,15 @@ import compress from '@fastify/compress';
 import csrf from '@fastify/csrf-protection';
 import swagger from '@fastify/swagger';
 
-import { schema } from './infrastructure/graphql/index.js';
+import { schema } from './infrastructure/graphql/schema.js';
 import { connectDatabase, closeDatabase } from './infrastructure/database/index.js';
 import { connectCache, closeCache } from './infrastructure/cache/index.js';
 import { config } from './config/index.js';
-import { logger } from './domains/shared/utils/logger.js';
-import { errorHandler } from './domains/shared/utils/error-handler.js';
+import { logger } from './utils/logger.js';
+import { errorHandler } from './utils/error-handler.js';
 import { sanitizeInputs } from './middleware/security.js';
 import { swaggerOptions } from './config/swagger.js';
+import { setupGracefulShutdown } from './utils/graceful-shutdown.js';
 
 export const app = Fastify({
   logger,
@@ -63,16 +64,8 @@ async function startServer() {
       host: config.host
     });
 
-    // Graceful shutdown
-    const shutdown = async () => {
-      await app.close();
-      await closeDatabase();
-      await closeCache();
-      process.exit(0);
-    };
-
-    process.on('SIGTERM', shutdown);
-    process.on('SIGINT', shutdown);
+    // Setup graceful shutdown
+    setupGracefulShutdown(app);
 
   } catch (error) {
     logger.error(error);

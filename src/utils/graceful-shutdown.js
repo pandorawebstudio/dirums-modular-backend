@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { logger } from './logger.js';
 
 export function setupGracefulShutdown(fastify) {

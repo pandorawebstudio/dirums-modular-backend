@@ -1,10 +1,11 @@
-import { connectDatabase, closeDatabase } from '../infrastructure/database/index.js';
+import mongoose from 'mongoose';
+import { connectDatabase, closeDatabase } from '../../infrastructure/database/index.js';
 import { seedUsers } from './user.seeder.js';
 import { seedProducts } from './product.seeder.js';
 import { seedCategories } from './category.seeder.js';
 import { seedOrders } from './order.seeder.js';
 import { seedCollections } from './collection.seeder.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../utils/logger.js';
 
 async function seedDatabase() {
   try {

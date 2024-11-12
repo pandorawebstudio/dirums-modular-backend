@@ -1,9 +1,7 @@
-// Shared Domain Exports
-export * from './media/media.service.js';
-export * from './notification/notification.service.js';
-export * from './workflow/workflow.service.js';
+import { logger } from '../../utils/logger.js';
+import { errorHandler } from '../../utils/error-handler.js';
 
-// Utilities
-export * from './utils/logger.js';
-export * from './utils/error-handler.js';
-export * from './utils/validator.js';
+export {
+  logger,
+  errorHandler
+};
